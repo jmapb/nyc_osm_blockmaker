@@ -22,7 +22,7 @@ if len(block) < 6:
     sys.exit(1)
 
 footprints_response = requests.get("{}?$where=starts_with(base_bbl,'{}')".format(footprints_api, block))
-footprints_response.raise_for_status();
+footprints_response.raise_for_status()
 for fp in footprints_response.json():
     fp_ways = []
     addr_desc = ''
@@ -56,7 +56,8 @@ for fp in footprints_response.json():
                         gs_response = requests.get("{}Function_1B?Borough={}&AddressNo={}&StreetName={}&TPAD=Y&Key={}".format(geoservice_api, block[0], tags['addr:housenumber'], tags['addr:street'], geoservice_api_key))
                         gs_addr_info = gs_response.json()['display']
                         tags['addr:postcode'] = gs_addr_info['out_zip_code']
-                        tags['addr:city'] = gs_addr_info['out_usps_city_name'].strip().title()
+                        # Uncomment to include addr:city from NYC Geoservice data
+                        #tags['addr:city'] = gs_addr_info['out_usps_city_name'].strip().title()
                     else:
                         addr_desc = ', not tagging address (multiple addresses found)'
                 else:
@@ -105,3 +106,4 @@ if footprint_count:
     f.close()
 else:
     print("No footprints found")
+    
