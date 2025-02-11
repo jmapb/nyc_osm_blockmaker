@@ -1,15 +1,16 @@
 import sys
 import requests
 
-geoservice_api = 'https://geoservice.planning.nyc.gov/geoservice/geoservice.svc/'
-footprints_api = 'https://data.cityofnewyork.us/resource/5zhs-2jue.json'
+GEOSERVICE_API = 'https://geoservice.planning.nyc.gov/geoservice/geoservice.svc/'
+FOOTPRINTS_API = 'https://data.cityofnewyork.us/resource/5zhs-2jue.json'
+
 nodes = {}
 ways = []
 multipolygons = []
 footprint_count = 0
-
 block = ''
 geoservice_api_key = ''
+
 if len(sys.argv) > 1:
     block = sys.argv[1]
     if len(sys.argv) > 2:
@@ -21,7 +22,7 @@ if len(block) < 6:
     print("  Block code must be 6 digits long (1 for borough + 5 for block)")
     sys.exit(1)
 
-footprints_response = requests.get("{}?$where=starts_with(base_bbl,'{}')".format(footprints_api, block))
+footprints_response = requests.get("{}?$where=starts_with(base_bbl,'{}')".format(FOOTPRINTS_API, block))
 footprints_response.raise_for_status()
 for fp in footprints_response.json():
     fp_ways = []
@@ -44,7 +45,7 @@ for fp in footprints_response.json():
         tags['height'] = round(float(fp['heightroof']) * 0.3048, 1)
         tags['nycdoitt:bin'] = fp['bin']
         if len(geoservice_api_key) > 1:
-            gs_response = requests.get("{}Function_BIN?BIN={}&TPAD=Y&Key={}".format(geoservice_api, fp['bin'], geoservice_api_key))
+            gs_response = requests.get("{}Function_BIN?BIN={}&TPAD=Y&Key={}".format(GEOSERVICE_API, fp['bin'], geoservice_api_key))
             if gs_response.status_code == requests.codes.ok:
                 gs_addresses = gs_response.json()['display']['AddressRangeList']
                 gs_addresses = [a for a in gs_addresses if a['low_address_number'].strip() != '']
@@ -53,7 +54,7 @@ for fp in footprints_response.json():
                         tags['addr:housenumber'] = gs_addresses[0]['low_address_number'].strip()
                         tags['addr:street'] = gs_addresses[0]['street_name'].strip().title()
                         addr_desc = ', {} {}'.format(tags['addr:housenumber'], tags['addr:street'])
-                        gs_response = requests.get("{}Function_1B?Borough={}&AddressNo={}&StreetName={}&TPAD=Y&Key={}".format(geoservice_api, block[0], tags['addr:housenumber'], tags['addr:street'], geoservice_api_key))
+                        gs_response = requests.get("{}Function_1B?Borough={}&AddressNo={}&StreetName={}&TPAD=Y&Key={}".format(GEOSERVICE_API, block[0], tags['addr:housenumber'], tags['addr:street'], geoservice_api_key))
                         gs_addr_info = gs_response.json()['display']
                         tags['addr:postcode'] = gs_addr_info['out_zip_code']
                         # Uncomment to include addr:city from NYC Geoservice data
@@ -84,7 +85,7 @@ if footprint_count:
     print("Processed {} footprints, writing block{}.osm with {} nodes, {} ways, {} multipolygons".format(footprint_count, block, len(nodes), len(ways), len(multipolygons)))
     f = open("block{}.osm".format(block), "w")
     f.write("<?xml version='1.0' encoding='UTF-8'?>\r")
-    f.write("<osm version='0.6' generator='nyc_osm_blockmaker'>\r")
+    f.write("<osm version='0.6' generator='nyc_osm_blockmaker' upload='false'>\r")
     for lonlat, id in nodes.items():
         f.write("  <node id='-{}' action='modify' visible='true' lat='{}' lon='{}' />\r".format(id, lonlat[1], lonlat[0]))
     for way_id, way in enumerate(ways):
