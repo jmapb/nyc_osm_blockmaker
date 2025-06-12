@@ -85,7 +85,7 @@ for fp in fp_response.json():
     if fp_ways:
         footprint_count += 1
         tags = {'building': 'yes'}
-        tags['height'] = round(float(fp['heightroof']) * 0.3048, 1)
+        tags['height'] = round(float(fp['height_roof']) * 0.3048, 1)
         tags['nycdoitt:bin'] = fp['bin']
         if len(geoservice_api_key) > 1:
             gs_response = requests.get("{}Function_BIN?BIN={}&TPAD=Y&Key={}".format(GEOSERVICE_API, fp['bin'], geoservice_api_key))
