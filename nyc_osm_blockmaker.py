@@ -1,3 +1,4 @@
+import os
 import sys
 import requests
 
@@ -10,6 +11,7 @@ multipolygons = []
 footprint_count = 0
 block = ''
 geoservice_api_key = ''
+
 
 def ordinal(n):
     if 11 <= (n % 100) <= 13:
@@ -54,10 +56,13 @@ def nyc_street_to_osm(nyc_street):
 def pluralize(n, unit):
     return '{} {}{}'.format(n, unit, '' if n == 1 else 's')
 
+
 if len(sys.argv) > 1:
     block = sys.argv[1]
     if len(sys.argv) > 2:
         geoservice_api_key = sys.argv[2]
+    else:
+        geoservice_api_key = os.environ.get('GEOSERVICE_API_KEY', '')
 
 if len(block) < 6:
     print("Usage:")
