@@ -7,12 +7,10 @@ Download New York City building footprints and convert to OpenStreetMap format
 `nyc_osm_blockmaker.py block [nyc_geoservice_api_key]`
 
 * `block` should be a 6-digit code that specifies a city block -- 1 digit for the borough (1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=Staten Island) and 5 for the block number within that borough. Additional digits can be appended to request a partial block, up to a full 9-digit BBL (borough-block-lot) code.\
-\
 All building footprints that match the requested block will be converted to OpenStreetMap features and saved in a single `.osm` file. Building ways and multipolygons will be tagged with `building=yes`, `height`, and `nycdoitt:bin`, as in the original NYC building import. (See https://github.com/osmlab/nycbuildings.)
 
 * `nyc_geoservice_api_key` is optional. If specified, will be used to add addresses from NYC's Geoservice API to the footprint features. (See https://geoservice.planning.nyc.gov/Register to request a Geoservice API key.) Buildings with only a single address will be tagged with `addr:housenumber`, `addr:street`, and `addr:postcode`. Buildings with multiple possible addresses will remain untagged -- address data for these is best determined by survey.\
-\
-If no API key is specified on the command line, the environment variable GEOSERVICE_API_KEY will be used, if found. Passing a single char as the API key on the command line (eg `nyc_osm_blockmaker.py 101020 -`) will prevent checking for the environment variable.
+If no API key is specified on the command line, the environment variable GEOSERVICE_API_KEY will be used, if found. Passing a single char as the API key on the command line (eg `nyc_osm_blockmaker.py 101020 -`) will prevent checking for this environment variable.
 
 ### Examples:
 
